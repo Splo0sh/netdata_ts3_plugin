@@ -143,6 +143,13 @@ class Service(SocketService):
             self.sid = 1
             self.debug("No sid specified. Using: '{0}'".format(self.sid))
 
+        try:
+            self.nickname = self.configuration['nickname']
+
+        except KeyError:
+            self.nickname = 'ts3netdata'
+            self.debug("No nickname specified. Using: '{0}'".format(self.nickname))
+
         # Check once if TS3 is running when host is localhost.
         if self.host in ['localhost', '127.0.0.1']:
             TS3_running = False
@@ -181,6 +188,8 @@ class Service(SocketService):
                     self._sock.send("login {0} {1}\n".format(self.user, self.passwd).encode())
                     self._receive()
                     self._sock.send("use sid={0}\n".format(self.sid).encode())
+                    self._receive()
+                    self._sock.send("clientupdate client_nickname={0}\n".format(self.nickname).encode())
                     self._receive()
                     self.loggedIn = True
                 self._sock.send(self.request)
